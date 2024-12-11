@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Graph Plotter</title>
+</head>
+<body>
+    <canvas id="graphCanvas" width="800" height="400" style="border:1px solid #000;"></canvas>
+    <p>Press <code>ArrowDown</code> to decrease or <code>ArrowUp</code> to increase the value of <code>k</code> and redraw the graph.</p>
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const width = canvas.width;
+        const height = canvas.height;
+
+        const scaleX = 40;
+        const scaleY = 100;
+        const originX = width / 2;
+        const originY = height / 2;
+
+        let k = 1;
+
+        function drawAxes() {
+            ctx.beginPath();
+            ctx.strokeStyle = 'black';
+
+            ctx.moveTo(0, originY);
+            ctx.lineTo(width, originY);
+
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, height);
+
+            ctx.stroke();
+
+            ctx.font = '12px Arial';
+            ctx.fillStyle = 'black';
+            ctx.textAlign = 'center';
+
+            for (let x = -originX; x < width - originX; x += scaleX) {
+                const canvasX = originX + x;
+                ctx.moveTo(canvasX, originY - 5);
+                ctx.lineTo(canvasX, originY + 5);
+                ctx.stroke();
+                ctx.fillText((x / scaleX).toFixed(1), canvasX, originY + 15);
+            }
+
+            ctx.textAlign = 'right';
+            for (let y = -originY; y < height - originY; y += scaleY) {
+                const canvasY = originY - y;
+                ctx.moveTo(originX - 5, canvasY);
+                ctx.lineTo(originX + 5, canvasY);
+                ctx.stroke();
+                if (y !== 0) {
+                    ctx.fillText((y / scaleY).toFixed(1), originX - 10, canvasY + 3);
+                }
+            }
+        }
+
+        function plotFunction(func, color = 'blue') {
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+
+            let first = true;
+            for (let x = -originX; x < width - originX; x += 0.1) {
+                const mathX = x / scaleX;
+                const mathY = func(mathX);
+
+                const canvasX = originX + x;
+                const canvasY = originY - mathY * scaleY;
+
+                if (first) {
+                    ctx.moveTo(canvasX, canvasY);
+                    first = false;
+                } else {
+                    ctx.lineTo(canvasX, canvasY);
+                }
+            }
+
+            ctx.stroke();
+        }
+
+        function redrawGraph() {
+            ctx.clearRect(0, 0, width, height);
+            drawAxes();
+            plotFunction(x => k * Math.sin(x), 'red');
+        }
+
+        redrawGraph();
+
+
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowDown') {
+                k -= 0.1;
+            } else if (event.key === 'ArrowUp') {
+                k += 0.1;
+            }
+            redrawGraph();
+        });
+    </script>
+</body>
+</html>
+
