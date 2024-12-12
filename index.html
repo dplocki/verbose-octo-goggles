@@ -6,109 +6,111 @@
     <title>Interactive Graph Plotter</title>
 </head>
 <body>
-    <canvas id="graphCanvas" width="800" height="400" style="border:1px solid #000;"></canvas>
-    <p>Press <code>ArrowDown</code> to decrease or <code>ArrowUp</code> to increase the value of <code>k</code> and redraw the graph.</p>
+    <div x-data="app" @keydown.window="globalKeydownPress">
+        <canvas id="graphCanvas" width="800" height="400" style="border:1px solid #000;"></canvas>
+        <p>Press <code>ArrowDown</code> to decrease or <code>ArrowUp</code> to increase the value of <code>k</code> and redraw the graph.</p>
 
-    <p>Formula: <input id="formula" type="text" value="k * Math.sin(x)"></input></p>
+        <p>Formula: <input type="text" x-model.debounce.500ms="formula" x-init="$watch('formula', value => redrawGraph())" /></p>
+    </div>
 
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.js"></script>
     <script>
-        const canvas = document.getElementById('graphCanvas');
-        const ctx = canvas.getContext('2d');
-        const formulaTextInput = document.getElementById('formula');
+        document.addEventListener('alpine:init', () => {
+            const canvas = document.getElementById('graphCanvas');
+            const ctx = canvas.getContext('2d');
+            let k = 1;
 
-        const width = canvas.width;
-        const height = canvas.height;
+            Alpine.data('app', () => ({
+                width: canvas.width,
+                height: canvas.height,
+                scaleX: 40,
+                scaleY: 100,
+                originX: 0,
+                originY: 0,
+                formula: 'k * Math.sin(x)',
 
-        const scaleX = 40;
-        const scaleY = 100;
-        const originX = width / 2;
-        const originY = height / 2;
+                init() {
+                    this.originX = this.width / 2;
+                    this.originY = this.height / 2;
+                    this.redrawGraph();
+                },
 
-        let k = 1;
+                drawAxes() {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'black';
 
-        function drawAxes() {
-            ctx.beginPath();
-            ctx.strokeStyle = 'black';
+                    ctx.moveTo(0, this.originY);
+                    ctx.lineTo(this.width, this.originY);
 
-            ctx.moveTo(0, originY);
-            ctx.lineTo(width, originY);
+                    ctx.moveTo(this.originX, 0);
+                    ctx.lineTo(this.originX, this.height);
 
-            ctx.moveTo(originX, 0);
-            ctx.lineTo(originX, height);
+                    ctx.stroke();
 
-            ctx.stroke();
+                    ctx.font = '12px Arial';
+                    ctx.fillStyle = 'black';
+                    ctx.textAlign = 'center';
 
-            ctx.font = '12px Arial';
-            ctx.fillStyle = 'black';
-            ctx.textAlign = 'center';
+                    for (let x = -this.originX; x < this.width - this.originX; x += this.scaleX) {
+                        const canvasX = this.originX + x;
+                        ctx.moveTo(canvasX, this.originY - 5);
+                        ctx.lineTo(canvasX, this.originY + 5);
+                        ctx.stroke();
+                        ctx.fillText((x / this.scaleX).toFixed(1), this.canvasX, this.originY + 15);
+                    }
 
-            for (let x = -originX; x < width - originX; x += scaleX) {
-                const canvasX = originX + x;
-                ctx.moveTo(canvasX, originY - 5);
-                ctx.lineTo(canvasX, originY + 5);
-                ctx.stroke();
-                ctx.fillText((x / scaleX).toFixed(1), canvasX, originY + 15);
-            }
+                    ctx.textAlign = 'right';
+                    for (let y = -this.originY; y < this.height - this.originY; y += this.scaleY) {
+                        const canvasY = this.originY - y;
+                        ctx.moveTo(this.originX - 5, this.canvasY);
+                        ctx.lineTo(this.originX + 5, this.canvasY);
+                        ctx.stroke();
+                        if (y !== 0) {
+                            ctx.fillText((y / this.scaleY).toFixed(1), this.originX - 10, this.canvasY + 3);
+                        }
+                    }
+                },
 
-            ctx.textAlign = 'right';
-            for (let y = -originY; y < height - originY; y += scaleY) {
-                const canvasY = originY - y;
-                ctx.moveTo(originX - 5, canvasY);
-                ctx.lineTo(originX + 5, canvasY);
-                ctx.stroke();
-                if (y !== 0) {
-                    ctx.fillText((y / scaleY).toFixed(1), originX - 10, canvasY + 3);
+                plotFunction(func, color = 'blue') {
+                    ctx.beginPath();
+                    ctx.strokeStyle = color;
+
+                    let first = true;
+                    for (let x = -this.originX; x < this.width - this.originX; x += 0.1) {
+                        const mathX = x / this.scaleX;
+                        const mathY = func(mathX);
+
+                        const canvasX = this.originX + x;
+                        const canvasY = this.originY - mathY * this.scaleY;
+
+                        if (first) {
+                            ctx.moveTo(canvasX, canvasY);
+                            first = false;
+                        } else {
+                            ctx.lineTo(canvasX, canvasY);
+                        }
+                    }
+
+                    ctx.stroke();
+                },
+
+                redrawGraph() {
+                    ctx.clearRect(0, 0, this.width, this.height);
+                    this.drawAxes();
+                    this.plotFunction(x => eval(this.formula), 'red');
+                },
+
+                globalKeydownPress(event) {
+                    if (event.key === 'ArrowDown') {
+                        k -= 0.1;
+                        this.redrawGraph();
+                    } else if (event.key === 'ArrowUp') {
+                        k += 0.1;
+                        this.redrawGraph();
+                    }
                 }
-            }
-        }
-
-        function plotFunction(func, color = 'blue') {
-            ctx.beginPath();
-            ctx.strokeStyle = color;
-
-            let first = true;
-            for (let x = -originX; x < width - originX; x += 0.1) {
-                const mathX = x / scaleX;
-                const mathY = func(mathX);
-
-                const canvasX = originX + x;
-                const canvasY = originY - mathY * scaleY;
-
-                if (first) {
-                    ctx.moveTo(canvasX, canvasY);
-                    first = false;
-                } else {
-                    ctx.lineTo(canvasX, canvasY);
-                }
-            }
-
-            ctx.stroke();
-        }
-
-        function redrawGraph() {
-            ctx.clearRect(0, 0, width, height);
-            drawAxes();
-            plotFunction(x => eval(formulaTextInput.value), 'red');
-        }
-
-        formulaTextInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                redrawGraph();
-            }
-        });
-
-        redrawGraph();
-
-        window.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowDown') {
-                k -= 0.1;
-                redrawGraph();
-            } else if (event.key === 'ArrowUp') {
-                k += 0.1;
-                redrawGraph();
-            }
+            }));
         });
     </script>
 </body>
 </html>
-
