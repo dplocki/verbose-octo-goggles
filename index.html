@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Interactive Graph Plotter</title>
+
+    <link href="style.css" rel="stylesheet" />
 </head>
 <body>
     <div x-data="app" @keydown.window="globalKeydownPress">
-        <canvas id="graphCanvas" width="800" height="400" style="border:1px solid #000;"></canvas>
+        <canvas id="graphCanvas" width="800" height="400"></canvas>
         <p>Press <code>ArrowDown</code> to decrease or <code>ArrowUp</code> to increase the value of <code>k</code> and redraw the graph.</p>
 
         <p>Formula: <input type="text" x-model.debounce.500ms="formula" x-init="$watch('formula', value => redrawGraph())" /></p>
