@@ -39,17 +39,17 @@ document.addEventListener('alpine:init', () => {
                 ctx.moveTo(canvasX, this.originY - 5);
                 ctx.lineTo(canvasX, this.originY + 5);
                 ctx.stroke();
-                ctx.fillText((x / this.scaleX).toFixed(1), this.canvasX, this.originY + 15);
+                ctx.fillText((x / this.scaleX).toFixed(1), canvasX, this.originY + 15);
             }
 
             ctx.textAlign = 'right';
             for (let y = -this.originY; y < this.height - this.originY; y += this.scaleY) {
                 const canvasY = this.originY - y;
-                ctx.moveTo(this.originX - 5, this.canvasY);
-                ctx.lineTo(this.originX + 5, this.canvasY);
+                ctx.moveTo(this.originX - 5, canvasY);
+                ctx.lineTo(this.originX + 5, canvasY);
                 ctx.stroke();
                 if (y !== 0) {
-                    ctx.fillText((y / this.scaleY).toFixed(1), this.originX - 10, this.canvasY + 3);
+                    ctx.fillText((y / this.scaleY).toFixed(1), this.originX - 10, canvasY + 3);
                 }
             }
         },
