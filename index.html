@@ -11,7 +11,7 @@
 <body>
     <div x-data="app" @keydown.window="globalKeydownPress">
         <canvas id="graphCanvas" width="800" height="400"></canvas>
-        <p>Press <code>ArrowDown</code> to decrease or <code>ArrowUp</code> to increase the value of <code>k</code> and redraw the graph.</p>
+        <p>Press <code>ArrowDown</code> to decrease or <code>ArrowUp</code> to increase the value of <code>k</code> (<code x-text="k"></code>) and redraw the graph.</p>
 
         <p>Formula: <input type="text" x-model.debounce.500ms="formula" x-init="$watch('formula', value => redrawGraph())" /></p>
     </div>

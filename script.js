@@ -1,7 +1,6 @@
 document.addEventListener('alpine:init', () => {
     const canvas = document.getElementById('graphCanvas');
     const ctx = canvas.getContext('2d');
-    let k = 1;
 
     Alpine.data('app', () => ({
         width: canvas.width,
@@ -10,6 +9,7 @@ document.addEventListener('alpine:init', () => {
         scaleY: 100,
         originX: 0,
         originY: 0,
+        k: 1,
         formula: 'k * Math.sin(x)',
 
         init() {
@@ -80,15 +80,15 @@ document.addEventListener('alpine:init', () => {
         redrawGraph() {
             ctx.clearRect(0, 0, this.width, this.height);
             this.drawAxes();
-            this.plotFunction(x => eval(this.formula), 'red');
+            this.plotFunction(((k) => x => eval(this.formula))(this.k), 'red');
         },
 
         globalKeydownPress(event) {
             if (event.key === 'ArrowDown') {
-                k -= 0.1;
+                this.k -= 0.1;
                 this.redrawGraph();
             } else if (event.key === 'ArrowUp') {
-                k += 0.1;
+                this.k += 0.1;
                 this.redrawGraph();
             }
         }
