@@ -2,7 +2,7 @@
 
 An interactive graph plot.
 
-Stack: JavaScript, HTML.
+Stack: JavaScript, Alpine.js, HTML.
 
 ## Alpine.js
 
