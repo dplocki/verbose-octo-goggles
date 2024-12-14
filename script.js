@@ -7,8 +7,8 @@ document.addEventListener('alpine:init', () => {
         height: canvas.height,
         scaleX: 40,
         scaleY: 100,
-        originX: 0,
-        originY: 0,
+        originX: null,
+        originY: null,
         k: 1,
         formula: 'k * Math.sin(x)',
 
