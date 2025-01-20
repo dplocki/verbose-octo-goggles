@@ -16,6 +16,12 @@
         <p>Formula: <input type="text" x-model.debounce.500ms="formula" x-init="$watch('formula', value => redrawGraph())" /></p>
     </div>
 
+    <div x-data="app">
+        <p>Settings:</p>
+        <p>scaleX: <input type="number" x-model.number="scaleX" x-init="$watch('scaleX', value => redrawGraph())" /></p>
+        <p>scaleY: <input type="number" x-model.number="scaleY" x-init="$watch('scaleY', value => redrawGraph())" /></p>
+    </div>
+
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.js"></script>
     <script src="script.js"></script>
 </body>
